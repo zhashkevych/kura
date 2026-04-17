@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default function LandingPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-20">
