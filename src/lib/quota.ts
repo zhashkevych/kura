@@ -1,8 +1,21 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { addMonths, startOfMonth } from 'date-fns';
 import { db } from '@/db';
-import { users } from '@/db/schema';
+import { subscriptions, users, type Subscription } from '@/db/schema';
 import { env } from './env';
+
+const PRO_STATUSES: Subscription['status'][] = ['trialing', 'active', 'past_due'];
+
+export async function isPro(userId: string): Promise<boolean> {
+  const rows = await db
+    .select({ id: subscriptions.id })
+    .from(subscriptions)
+    .where(
+      and(eq(subscriptions.userId, userId), inArray(subscriptions.status, PRO_STATUSES)),
+    )
+    .limit(1);
+  return rows.length > 0;
+}
 
 /**
  * Returns the start of the next calendar month at 00:00 local time.
@@ -13,14 +26,20 @@ export function nextMonthlyReset(now: Date): Date {
 }
 
 export type QuotaCheck =
-  | { ok: true; remaining: number; limit: number; resetAt: Date }
+  | { ok: true; unlimited: true }
+  | { ok: true; unlimited: false; remaining: number; limit: number; resetAt: Date }
   | { ok: false; remaining: 0; limit: number; resetAt: Date };
 
 /**
  * Atomically checks the user's monthly quota and increments usage when allowed.
  * Rolls the counter over when the stored reset timestamp has elapsed.
+ * Pro users (trialing/active/past_due sub) bypass the counter entirely.
  */
 export async function checkAndIncrementQuota(userId: string): Promise<QuotaCheck> {
+  if (await isPro(userId)) {
+    return { ok: true, unlimited: true };
+  }
+
   const limit = env.FREE_TIER_MONTHLY_LIMIT;
   const now = new Date();
 
@@ -55,6 +74,7 @@ export async function checkAndIncrementQuota(userId: string): Promise<QuotaCheck
 
   return {
     ok: true,
+    unlimited: false,
     remaining: limit - (effectiveCount + 1),
     limit,
     resetAt: effectiveReset,
@@ -77,7 +97,15 @@ export async function decrementQuota(userId: string): Promise<void> {
     .where(eq(users.id, userId));
 }
 
-export async function getQuotaStatus(userId: string) {
+export type QuotaStatus =
+  | { unlimited: true }
+  | { unlimited: false; used: number; limit: number; remaining: number; resetAt: Date };
+
+export async function getQuotaStatus(userId: string): Promise<QuotaStatus> {
+  if (await isPro(userId)) {
+    return { unlimited: true };
+  }
+
   const rows = await db
     .select({
       count: users.monthlyUsageCount,
@@ -90,7 +118,9 @@ export async function getQuotaStatus(userId: string) {
   const user = rows[0];
   const limit = env.FREE_TIER_MONTHLY_LIMIT;
   const now = new Date();
-  if (!user) return { used: 0, limit, remaining: limit, resetAt: nextMonthlyReset(now) };
+  if (!user) {
+    return { unlimited: false, used: 0, limit, remaining: limit, resetAt: nextMonthlyReset(now) };
+  }
 
   // If the stored reset has elapsed, show the upcoming reset without mutating
   // state here — the next checkAndIncrementQuota call will persist it.
@@ -99,6 +129,7 @@ export async function getQuotaStatus(userId: string) {
   const used = expired ? 0 : user.count;
 
   return {
+    unlimited: false,
     used,
     limit,
     remaining: Math.max(0, limit - used),
