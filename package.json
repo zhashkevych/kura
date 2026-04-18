@@ -2,6 +2,28 @@
   "name": "kura",
   "version": "0.1.0",
   "private": true,
+  "description": "Turn any YouTube video into a structured Markdown note for your Obsidian vault or Notion database.",
+  "license": "MIT",
+  "author": "Maksim Zhashkevych",
+  "homepage": "https://kura-md.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhashkevych/kura.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zhashkevych/kura/issues"
+  },
+  "keywords": [
+    "youtube",
+    "transcript",
+    "summary",
+    "markdown",
+    "obsidian",
+    "notion",
+    "notes",
+    "gemini",
+    "nextjs"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

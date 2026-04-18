@@ -9,7 +9,24 @@
   </picture>
 </p>
 
-Paste a YouTube URL → get a structured Markdown note for your Obsidian vault or Notion database.
+<p align="center">
+  <a href="https://kura-md.com"><strong>Live demo →</strong></a>
+  &nbsp;·&nbsp;
+  <a href="./CLAUDE.md">Architecture</a>
+  &nbsp;·&nbsp;
+  <a href="./CONTRIBUTING.md">Contributing</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/zhashkevych/kura/issues">Issues</a>
+</p>
+
+Paste a YouTube URL → get a structured Markdown note for your Obsidian vault or
+Notion database. Kura runs the transcript through Gemini against a Handlebars
+template, gives you back a `.md` file that drops cleanly into your existing
+notes.
+
+The hosted version at [kura-md.com](https://kura-md.com) is free with a small
+monthly quota. This repo is the entire app — fork it, self-host it, change the
+templates, change the model.
 
 ## Stack
 
@@ -22,7 +39,10 @@ Paste a YouTube URL → get a structured Markdown note for your Obsidian vault o
 - Gemini 2.5 Flash for structured output
 - Handlebars for Markdown templates
 
-## Setup
+## Self-host
+
+You'll need accounts on four free-tier services. The whole setup takes about
+ten minutes.
 
 1. **Install dependencies**
 
@@ -34,16 +54,18 @@ Paste a YouTube URL → get a structured Markdown note for your Obsidian vault o
 
    - [Neon](https://neon.tech) — create a project, copy the pooled connection string.
    - [Clerk](https://clerk.com) — create an application, grab the publishable + secret keys.
-     Create a webhook pointing at `https://<your-domain>/api/webhooks/clerk` listening for
-     `user.created`, `user.updated`, `user.deleted`. Copy the signing secret.
-   - [Supadata](https://supadata.ai) — API key.
+     For production, also create a webhook pointing at
+     `https://<your-domain>/api/webhooks/clerk` listening for `user.created`,
+     `user.updated`, `user.deleted` and copy the signing secret. Local dev
+     works without the webhook — users are lazily provisioned on first request.
+   - [Supadata](https://supadata.ai) — API key for transcript fetching.
    - [Google AI Studio](https://aistudio.google.com) — API key for Gemini.
 
 3. **Configure environment**
 
    ```bash
    cp .env.example .env.local
-   # fill in every required value
+   # fill in every value
    ```
 
 4. **Run migrations + seed**
@@ -76,25 +98,47 @@ npx tsx scripts/test-transcript.ts "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 npx tsx scripts/test-summary.ts "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```
 
-## Manual QA checklist
+## Architecture
 
-Before shipping to prod, verify:
+See [`CLAUDE.md`](./CLAUDE.md) for the full architecture: request flow, the
+quota invariants, the LLM contract and its three-schema lockstep, the
+auth/database setup, and the gotchas you should know before changing anything.
 
-- [ ] Sign up → paste URL → summary completes → download `.md` → opens cleanly in Obsidian.
-- [ ] Paste an invalid URL → friendly error (not a 500).
-- [ ] Paste a video with no captions → friendly error.
-- [ ] Paste the same URL twice → second POST returns the same `summaryId` and does not increment quota.
-- [ ] Hit the monthly quota (default: 10) → `402` response with a clear message.
-- [ ] Vercel logs show no uncaught exceptions after 24h of normal usage.
+A 30-second version: `POST /api/summaries` validates and reserves quota
+synchronously, then schedules the heavy work via Next's `after()`. The worker
+fetches the transcript, calls Gemini with a constrained JSON schema, validates
+with Zod (with a repair-retry ladder), and writes the result. The client polls
+for completion and renders the Markdown via the template's Handlebars source.
 
 ## Deploying to Vercel
 
-1. Push this repo to GitHub and import it in Vercel.
+1. Push your fork to GitHub and import it in Vercel.
 2. Set every variable from `.env.example` in the project settings.
-3. Ensure "Fluid Compute" is enabled so `after()` background work has time to finish.
+3. Enable **Fluid Compute** so `after()` background work has time to finish —
+   this is non-optional. Without it, summaries will silently truncate.
 4. Point your Clerk webhook at the production URL.
-5. Run `npm run db:push && npm run db:seed` from your workstation against the production
-   `DATABASE_URL` once on first deploy.
+5. Run `npm run db:push && npm run db:seed` from your workstation against the
+   production `DATABASE_URL` once on first deploy.
+
+## Roadmap and non-goals
+
+The current open-source release is the MVP: paste a URL, get a Markdown note.
+The following are deliberately not implemented and are signaled in the schema
+but unwired in code — see `CONTRIBUTING.md` for direction before working on
+any of them:
+
+- Notion sync
+- User-owned custom templates UI
+- YouTube channel subscriptions / auto-ingest
+- pgvector / semantic search
+
+## Contributing
+
+PRs welcome. Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the dev loop,
+commit conventions, and what's in vs out of scope.
+
+For security issues, please follow [`SECURITY.md`](./SECURITY.md) instead of
+filing a public issue.
 
 ## Testing
 
@@ -104,7 +148,8 @@ npm test
 npm run build
 ```
 
-## Scope
+CI runs all three on every PR.
 
-This is the MVP described in `kura-technical-spec.md`. Notion sync, custom templates, channel
-subscriptions, and pgvector search are explicitly Phase 2+.
+## License
+
+[MIT](./LICENSE) © 2026 Maksim Zhashkevych
