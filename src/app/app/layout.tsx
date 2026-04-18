@@ -21,7 +21,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <kbd className="hidden sm:inline-block text-xs border border-[var(--border)] rounded px-1.5 py-0.5 text-[var(--muted-foreground)]">
               ⌘K
             </kbd>
-            <UserButton afterSignOutUrl="/" />
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: 'h-8 w-8',
+                },
+              }}
+            />
           </div>
         </div>
       </header>
