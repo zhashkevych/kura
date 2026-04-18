@@ -43,8 +43,6 @@ tags: [{{#each content.tags}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}]
 processed: {{summary.createdAt}}
 ---
 
-# {{video.title}}
-
 > {{content.oneLineSummary}}
 
 ## Cliff Notes

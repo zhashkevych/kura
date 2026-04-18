@@ -25,7 +25,7 @@ export function SummaryViewer({ markdown }: { markdown: string }) {
           a: (props) => <a className="text-[var(--primary)] underline" {...props} />,
           blockquote: (props) => (
             <blockquote
-              className="border-l-2 border-[var(--border)] pl-4 italic text-[var(--muted-foreground)] my-4"
+              className="border-l-2 border-[var(--muted-foreground)]/40 pl-4 italic text-base text-[var(--foreground)] my-5"
               {...props}
             />
           ),
