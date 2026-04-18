@@ -15,7 +15,7 @@ Published: {{publishedDate}}
 Produce a structured note with the following fields:
 
 1. **oneLineSummary**: A single sentence capturing the core thesis or takeaway.
-2. **cliffNotes**: 5–10 bullet points capturing the most important claims, findings, or ideas. Each bullet should be a complete thought, not a fragment. Write as if for your future self re-reading in 6 months.
+2. **cliffNotes**: 5–10 bullet points capturing the most important claims, findings, or ideas. Each bullet should be a complete thought, not a fragment. Write as if for your future self re-reading in 6 months. Each cliffNotes bullet must be a single complete sentence under 30 words. If a point requires more, split it into multiple adjacent bullets. Do not merge distinct ideas into compound bullets.
 3. **summary**: A 2–4 paragraph prose summary. Flowing, readable, no filler. Preserve the speaker's reasoning chain.
 4. **keyQuotes**: 3–7 verbatim quotes that are genuinely insightful, memorable, or represent the core argument. For each, include the startSeconds from the transcript and a human-readable timestampLabel (e.g., "12:34"). Skip filler quotes like "that's a great question."
 5. **furtherReading**: Every book, paper, person, tool, or concept mentioned that would be worth following up on. Include author/creator when stated. Include links only if they appear in the transcript.

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const summaryContentSchema = z.object({
   oneLineSummary: z.string().min(10).max(300),
-  cliffNotes: z.array(z.string().min(5)).min(3).max(12),
+  cliffNotes: z.array(z.string().min(5).max(200)).min(3).max(12),
   summary: z.string().min(100).max(4000),
   keyQuotes: z
     .array(

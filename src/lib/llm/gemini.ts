@@ -94,6 +94,8 @@ export async function generateSummary({
   // One primary attempt + one Zod-repair retry.
   // Transient network/5xx errors get their own exponential backoff inside.
   let lastZodIssue: string | null = null;
+  let lastParsed: unknown = null;
+  let lastUsage: { promptTokenCount?: number; candidatesTokenCount?: number } | undefined;
 
   for (let attempt = 0; attempt < 2; attempt++) {
     const prompt =
@@ -107,7 +109,7 @@ Fix the specific issue and return a valid JSON object. Do not include any other 
 
     const result = await callWithBackoff(() => model.generateContent(prompt));
     const text = result.response.text();
-    const usage = result.response.usageMetadata;
+    lastUsage = result.response.usageMetadata;
 
     let parsed: unknown;
     try {
@@ -116,11 +118,12 @@ Fix the specific issue and return a valid JSON object. Do not include any other 
       lastZodIssue = `Response was not valid JSON: ${(err as Error).message}`;
       continue;
     }
+    lastParsed = parsed;
 
     const check = summaryContentSchema.safeParse(parsed);
     if (check.success) {
-      const tokensInput = usage?.promptTokenCount ?? 0;
-      const tokensOutput = usage?.candidatesTokenCount ?? 0;
+      const tokensInput = lastUsage?.promptTokenCount ?? 0;
+      const tokensOutput = lastUsage?.candidatesTokenCount ?? 0;
       return {
         content: check.data,
         tokensInput,
@@ -136,7 +139,37 @@ Fix the specific issue and return a valid JSON object. Do not include any other 
       .join('; ');
   }
 
+  // Graceful fallback: if the only remaining issue is over-long cliff-note
+  // bullets, truncate them so we still return a usable summary instead of
+  // failing the whole job. Anything else still throws.
+  const repaired = repairOverlongCliffNotes(lastParsed);
+  if (repaired) {
+    const recheck = summaryContentSchema.safeParse(repaired);
+    if (recheck.success) {
+      const tokensInput = lastUsage?.promptTokenCount ?? 0;
+      const tokensOutput = lastUsage?.candidatesTokenCount ?? 0;
+      return {
+        content: recheck.data,
+        tokensInput,
+        tokensOutput,
+        costUsdCents: centsFromTokens(tokensInput, tokensOutput),
+        modelUsed: MODEL,
+      };
+    }
+  }
+
   throw new Error(`Gemini output failed schema validation after retry: ${lastZodIssue}`);
+}
+
+function repairOverlongCliffNotes(parsed: unknown): unknown | null {
+  if (!parsed || typeof parsed !== 'object') return null;
+  const obj = parsed as Record<string, unknown>;
+  const notes = obj.cliffNotes;
+  if (!Array.isArray(notes)) return null;
+  const truncated = notes.map((n) =>
+    typeof n === 'string' && n.length > 200 ? `${n.slice(0, 199)}…` : n,
+  );
+  return { ...obj, cliffNotes: truncated };
 }
 
 async function callWithBackoff<T>(fn: () => Promise<T>, tries = 3): Promise<T> {
