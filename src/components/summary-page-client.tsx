@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { formatTimestamp } from '@/lib/youtube';
@@ -98,6 +99,12 @@ export function SummaryPageClient({
 
   return (
     <article className="space-y-6">
+      <Link
+        href="/app"
+        className="inline-block text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+      >
+        ← Library
+      </Link>
       <header className="flex gap-4">
         {state.video.thumbnailUrl ? (
           <div className="relative w-40 h-[90px] rounded overflow-hidden shrink-0">
