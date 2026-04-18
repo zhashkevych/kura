@@ -181,6 +181,42 @@ export default function LandingPage() {
           Or self-host the open-source core with your own API key — free forever.
         </p>
       </section>
+
+      <section className="mx-auto max-w-3xl px-6 py-20">
+        <h2 className="text-3xl font-semibold tracking-tight">Frequently asked</h2>
+        <div className="mt-10">
+          <FaqItem question="Does this work with my existing Obsidian vault structure?">
+            Yes. Kura produces a standard <code>.md</code> file with YAML frontmatter — the same
+            format Obsidian uses natively. Drop it in any folder, use any existing tag taxonomy,
+            keep your current templater setup. Kura does not assume anything about your vault
+            layout.
+          </FaqItem>
+          <FaqItem question="Can I self-host? What about yt-dlp?">
+            Yes. The core pipeline is on GitHub. For self-hosting, you bring your own Gemini or
+            Claude API key. The open-source version includes a yt-dlp fallback for transcript
+            extraction when the hosted transcript provider is unavailable — useful if you care
+            about resilience or run into region-blocked videos.
+          </FaqItem>
+          <FaqItem question="What counts as a summary on the free tier?">
+            One URL processed = one summary, regardless of video length. Re-processing the same
+            URL does not count twice — we dedupe server-side. The counter resets monthly.
+          </FaqItem>
+          <FaqItem question="Which models does Kura use?">
+            The hosted tier uses Gemini 2.5 Flash for structured output. Self-hosters can swap in
+            any model that supports structured JSON output — Claude, GPT-4o, local models via an
+            OpenAI-compatible endpoint. Model choice is a config flag.
+          </FaqItem>
+          <FaqItem question="Is my data private?">
+            Transcripts and summaries are stored in your account&apos;s database row. They are
+            not used to train any model. On self-host, nothing leaves your machine except the
+            call to the LLM provider you chose. See the privacy policy for the full story.
+          </FaqItem>
+          <FaqItem question="What happens if I cancel Pro?">
+            Your summaries remain accessible and exportable. You drop to the free tier
+            (10/month). No data is deleted.
+          </FaqItem>
+        </div>
+      </section>
     </main>
   );
 }
@@ -191,6 +227,29 @@ function Feature({ title, body }: { title: string; body: string }) {
       <h3 className="font-semibold">{title}</h3>
       <p className="mt-2 text-sm text-[var(--muted-foreground)]">{body}</p>
     </div>
+  );
+}
+
+function FaqItem({ question, children }: { question: string; children: React.ReactNode }) {
+  return (
+    <details className="group border-b border-[var(--border)] py-4 [&_summary::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+        <span>{question}</span>
+        <span
+          aria-hidden="true"
+          className="font-mono text-lg leading-none text-[var(--muted-foreground)] group-open:hidden"
+        >
+          +
+        </span>
+        <span
+          aria-hidden="true"
+          className="hidden font-mono text-lg leading-none text-[var(--muted-foreground)] group-open:inline"
+        >
+          −
+        </span>
+      </summary>
+      <div className="mt-3 text-sm text-[var(--muted-foreground)]">{children}</div>
+    </details>
   );
 }
 
