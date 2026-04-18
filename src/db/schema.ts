@@ -17,6 +17,7 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   monthlyUsageCount: integer('monthly_usage_count').notNull().default(0),
   monthlyUsageResetAt: timestamp('monthly_usage_reset_at').notNull().defaultNow(),
+  stripeCustomerId: text('stripe_customer_id').unique(),
 });
 
 export const videos = pgTable('videos', {
@@ -112,6 +113,45 @@ export const channelSubscriptions = pgTable(
   }),
 );
 
+export const subscriptions = pgTable(
+  'subscriptions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    stripeSubscriptionId: text('stripe_subscription_id').notNull().unique(),
+    stripePriceId: text('stripe_price_id').notNull(),
+    status: text('status', {
+      enum: [
+        'trialing',
+        'active',
+        'past_due',
+        'canceled',
+        'incomplete',
+        'incomplete_expired',
+        'unpaid',
+        'paused',
+      ],
+    }).notNull(),
+    currentPeriodStart: timestamp('current_period_start').notNull(),
+    currentPeriodEnd: timestamp('current_period_end').notNull(),
+    cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+    trialEndsAt: timestamp('trial_ends_at'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (t) => ({
+    userIdIdx: index('subscriptions_user_id_idx').on(t.userId),
+  }),
+);
+
+export const processedStripeEvents = pgTable('processed_stripe_events', {
+  eventId: text('event_id').primaryKey(),
+  type: text('type').notNull(),
+  processedAt: timestamp('processed_at').notNull().defaultNow(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Video = typeof videos.$inferSelect;
@@ -120,3 +160,5 @@ export type Summary = typeof summaries.$inferSelect;
 export type NewSummary = typeof summaries.$inferInsert;
 export type Template = typeof templates.$inferSelect;
 export type NewTemplate = typeof templates.$inferInsert;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type NewSubscription = typeof subscriptions.$inferInsert;
