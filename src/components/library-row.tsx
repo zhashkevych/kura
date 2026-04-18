@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 import { formatTimestamp } from '@/lib/youtube';
 
 export type LibraryRowData = {
@@ -18,16 +19,24 @@ export type LibraryRowData = {
   thumbnailUrl: string | null;
 };
 
-function rowTitle(r: LibraryRowData): string {
-  if (r.title) return r.title;
+function rowTitle(r: LibraryRowData): { node: React.ReactNode; fetching: boolean } {
+  if (r.title) return { node: r.title, fetching: false };
   if (r.status === 'failed') {
     if (r.youtubeId) {
       const url = `https://www.youtube.com/watch?v=${r.youtubeId}`;
-      return url.length > 50 ? `${url.slice(0, 49)}…` : url;
+      return { node: url.length > 50 ? `${url.slice(0, 49)}…` : url, fetching: false };
     }
-    return 'Untitled summary';
+    return { node: 'Untitled summary', fetching: false };
   }
-  return 'Fetching…';
+  return {
+    node: (
+      <span className="inline-flex items-center gap-1.5 animate-pulse text-[var(--muted-foreground)]">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Fetching…
+      </span>
+    ),
+    fetching: true,
+  };
 }
 
 export function LibraryRow({ row }: { row: LibraryRowData }) {
@@ -89,7 +98,7 @@ export function LibraryRow({ row }: { row: LibraryRowData }) {
           <div className="shrink-0 w-40 h-[90px] bg-[var(--muted)] rounded" />
         )}
         <div className="flex-1 min-w-0">
-          <div className="font-medium line-clamp-2 break-all">{rowTitle(row)}</div>
+          <div className="font-medium line-clamp-2 break-all">{rowTitle(row).node}</div>
           <div className="text-sm text-[var(--muted-foreground)] mt-1">
             {row.channelName || '—'}
             {row.durationSeconds ? ` · ${formatTimestamp(row.durationSeconds)}` : ''}
