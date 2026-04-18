@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { formatTimestamp } from '@/lib/youtube';
 import { SummaryViewer } from './summary-viewer';
 import { DownloadButton } from './download-button';
+import { CopyMarkdownButton } from './copy-markdown-button';
 import { ProcessingIndicator } from './processing-indicator';
 
 type SummaryInitial = {
@@ -129,19 +130,22 @@ export function SummaryPageClient({
               ? ` · ${formatTimestamp(state.video.durationSeconds)}`
               : ''}
           </div>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {state.status === 'ready' && (
+              <>
+                <CopyMarkdownButton summaryId={state.id} markdown={markdown} />
+                <DownloadButton summaryId={state.id} />
+              </>
+            )}
             {youtubeUrl && (
               <a
                 href={youtubeUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-sm rounded border border-[var(--border)] px-2.5 py-1"
+                className="text-sm rounded px-2.5 py-1 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/50"
               >
                 Open on YouTube
               </a>
-            )}
-            {state.status === 'ready' && (
-              <DownloadButton summaryId={state.id} />
             )}
           </div>
         </div>
