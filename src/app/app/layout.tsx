@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
 import { CommandK } from '@/components/command-k';
+import { AppNav } from '@/components/app-nav';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,12 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             >
               kura
             </Link>
-            <nav className="flex items-center gap-4 text-sm text-[var(--muted-foreground)]">
-              <Link href="/app" className="hover:text-[var(--foreground)]">Library</Link>
-              <Link href="/app/new" className="hover:text-[var(--foreground)]">New</Link>
-              <Link href="/app/templates" className="hover:text-[var(--foreground)]">Templates</Link>
-              <Link href="/app/settings" className="hover:text-[var(--foreground)]">Settings</Link>
-            </nav>
+            <AppNav />
           </div>
           <div className="flex items-center gap-3">
             <kbd className="hidden sm:inline-block text-xs border border-[var(--border)] rounded px-1.5 py-0.5 text-[var(--muted-foreground)]">
