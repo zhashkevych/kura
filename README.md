@@ -2,6 +2,13 @@
 
 > 蔵 — a traditional Japanese storehouse. Kura is a storehouse for knowledge extracted from YouTube.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/marketing/hero-dark.webp">
+    <img alt="Kura summary view" src="public/marketing/hero-light.webp">
+  </picture>
+</p>
+
 Paste a YouTube URL → get a structured Markdown note for your Obsidian vault or Notion database.
 
 ## Stack
