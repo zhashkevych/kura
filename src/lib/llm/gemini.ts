@@ -139,10 +139,10 @@ Fix the specific issue and return a valid JSON object. Do not include any other 
       .join('; ');
   }
 
-  // Graceful fallback: if the only remaining issue is over-long cliff-note
-  // bullets, truncate them so we still return a usable summary instead of
+  // Graceful fallback: if the only remaining issues are over-long string
+  // fields, truncate them so we still return a usable summary instead of
   // failing the whole job. Anything else still throws.
-  const repaired = repairOverlongCliffNotes(lastParsed);
+  const repaired = repairOverlongStrings(lastParsed);
   if (repaired) {
     const recheck = summaryContentSchema.safeParse(repaired);
     if (recheck.success) {
@@ -161,15 +161,21 @@ Fix the specific issue and return a valid JSON object. Do not include any other 
   throw new Error(`Gemini output failed schema validation after retry: ${lastZodIssue}`);
 }
 
-function repairOverlongCliffNotes(parsed: unknown): unknown | null {
+function truncate(s: unknown, max: number): unknown {
+  if (typeof s !== 'string' || s.length <= max) return s;
+  return `${s.slice(0, max - 1)}…`;
+}
+
+function repairOverlongStrings(parsed: unknown): unknown | null {
   if (!parsed || typeof parsed !== 'object') return null;
   const obj = parsed as Record<string, unknown>;
-  const notes = obj.cliffNotes;
-  if (!Array.isArray(notes)) return null;
-  const truncated = notes.map((n) =>
-    typeof n === 'string' && n.length > 200 ? `${n.slice(0, 199)}…` : n,
-  );
-  return { ...obj, cliffNotes: truncated };
+  const out: Record<string, unknown> = { ...obj };
+  out.oneLineSummary = truncate(obj.oneLineSummary, 300);
+  out.summary = truncate(obj.summary, 4000);
+  if (Array.isArray(obj.cliffNotes)) {
+    out.cliffNotes = obj.cliffNotes.map((n) => truncate(n, 200));
+  }
+  return out;
 }
 
 async function callWithBackoff<T>(fn: () => Promise<T>, tries = 3): Promise<T> {
