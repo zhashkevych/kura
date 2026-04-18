@@ -24,8 +24,13 @@ export function UrlInputForm({ templates }: { templates: Template[] }) {
     e.preventDefault();
     setError(null);
 
-    if (!YT_URL_REGEX.test(url.trim())) {
-      setError('That doesn’t look like a YouTube URL.');
+    const trimmed = url.trim();
+    if (!trimmed) {
+      setError('Please paste a valid YouTube URL.');
+      return;
+    }
+    if (!YT_URL_REGEX.test(trimmed)) {
+      setError('Please paste a valid YouTube URL.');
       return;
     }
     if (!templateId) {
@@ -69,7 +74,10 @@ export function UrlInputForm({ templates }: { templates: Template[] }) {
           type="text"
           autoFocus
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            if (error) setError(null);
+          }}
           placeholder="https://www.youtube.com/watch?v=..."
           className="w-full rounded-md border border-[var(--border)] bg-transparent px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--primary)]"
           disabled={submitting}
@@ -105,7 +113,7 @@ export function UrlInputForm({ templates }: { templates: Template[] }) {
 
       <button
         type="submit"
-        disabled={submitting || !url}
+        disabled={submitting}
         className="rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 font-medium disabled:opacity-50"
       >
         {submitting ? 'Starting…' : 'Generate summary'}
