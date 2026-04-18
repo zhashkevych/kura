@@ -164,7 +164,71 @@ export function SummaryPageClient({
       ) : (
         <div className="text-[var(--muted-foreground)] text-sm">Loading…</div>
       )}
+
+      {!isFailed && <DeleteSummaryFooter onDelete={handleDelete} />}
     </article>
+  );
+}
+
+function DeleteSummaryFooter({ onDelete }: { onDelete: () => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const confirm = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await onDelete();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="pt-8 mt-8 border-t border-[var(--border)]">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-sm text-[var(--destructive)] hover:underline"
+      >
+        Delete this summary
+      </button>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !deleting && setOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-lg border border-[var(--border)] bg-[var(--background)] p-5 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="font-medium">Delete this summary?</div>
+            <div className="mt-1 text-sm text-[var(--muted-foreground)]">
+              This can&apos;t be undone.
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                disabled={deleting}
+                className="text-sm rounded border border-[var(--border)] px-3 py-1.5 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirm}
+                disabled={deleting}
+                className="text-sm rounded bg-[var(--destructive)] text-white px-3 py-1.5 disabled:opacity-50"
+              >
+                {deleting ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
