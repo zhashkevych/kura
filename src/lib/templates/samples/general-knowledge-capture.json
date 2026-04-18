@@ -1,0 +1,64 @@
+{
+  "video": {
+    "youtubeId": "Hu4Yvq-g7_Y",
+    "title": "How great leaders inspire action",
+    "channelName": "TED",
+    "durationSeconds": 1080,
+    "publishedAt": "2010-05-04"
+  },
+  "content": {
+    "oneLineSummary": "People don't buy what you do, they buy why you do it — and the most influential leaders, companies, and movements all communicate from the inside out.",
+    "cliffNotes": [
+      "Sinek introduces the Golden Circle: Why → How → What as the order in which truly inspiring leaders think and communicate.",
+      "Most organizations communicate from the outside in (What → How → Why), which appeals to logic but rarely inspires loyalty.",
+      "Apple's marketing leads with belief and challenge to the status quo before describing any product, modeling Why-first messaging.",
+      "Biology backs the model: the limbic brain governs trust and decisions, while the neocortex handles language and rational reasoning.",
+      "The Wright brothers beat better-funded competitors because they were driven by belief in flight rather than wealth or recognition.",
+      "Diffusion of innovation requires winning over the early-adopter 15–18 percent before the mass market follows.",
+      "Martin Luther King drew 250,000 people to the March on Washington by sharing what he believed, not what needed fixing.",
+      "Leaders who start with Why attract people who share their belief and will work with conviction rather than just for compensation."
+    ],
+    "summary": "Simon Sinek argues that the world's most influential leaders and organizations all share the same pattern of communication, which he calls the Golden Circle. Where most companies start by describing what they do and how they do it, the rare few start with why they exist — their core belief or purpose — and only then explain the how and the what. This inversion, he contends, is what separates the merely competent from the genuinely inspiring.\n\nThe model is grounded in brain biology. The neocortex handles language and analysis, but the limbic system, which governs feeling and decision-making, has no language. That is why Why-first communication produces gut-level trust and loyalty in a way that feature lists never can. Apple's longevity, the Wright brothers' first flight, and the civil rights movement are presented as instances of the same pattern: people followed because they shared the belief, not because of features, funding, or facts.\n\nSinek closes by linking the Golden Circle to the diffusion-of-innovation curve. New ideas spread only when the early-adopter minority — those willing to act on conviction — embrace them. Leading with Why is how a movement reaches and converts that minority before the mainstream takes notice."
+  ,
+    "keyQuotes": [
+      {
+        "quote": "People don't buy what you do; they buy why you do it.",
+        "startSeconds": 264,
+        "timestampLabel": "4:24"
+      },
+      {
+        "quote": "The goal is not to do business with everybody who needs what you have. The goal is to do business with people who believe what you believe.",
+        "startSeconds": 372,
+        "timestampLabel": "6:12"
+      },
+      {
+        "quote": "Martin Luther King gave the 'I have a dream' speech, not the 'I have a plan' speech.",
+        "startSeconds": 858,
+        "timestampLabel": "14:18"
+      }
+    ],
+    "furtherReading": [
+      {
+        "title": "Start With Why",
+        "author": "Simon Sinek",
+        "type": "book"
+      },
+      {
+        "title": "Diffusion of Innovations",
+        "author": "Everett Rogers",
+        "type": "book"
+      },
+      {
+        "title": "The Wright brothers' first powered flight",
+        "type": "concept"
+      }
+    ],
+    "tags": [
+      "leadership",
+      "marketing",
+      "communication",
+      "behavioral-science",
+      "innovation"
+    ]
+  }
+}

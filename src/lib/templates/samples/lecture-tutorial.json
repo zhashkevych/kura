@@ -1,0 +1,65 @@
+{
+  "video": {
+    "youtubeId": "fake-lecture-id",
+    "title": "MIT 6.006 — Introduction to Algorithms: Lecture 1",
+    "channelName": "MIT OpenCourseWare",
+    "durationSeconds": 3060,
+    "publishedAt": "2020-01-15"
+  },
+  "content": {
+    "oneLineSummary": "Algorithms are about provably efficient solutions to well-specified computational problems, and asymptotic analysis is the language we use to compare them.",
+    "cliffNotes": [
+      "A computational problem specifies a precise mapping from inputs to required outputs; an algorithm is any procedure that computes that mapping.",
+      "Correctness means the algorithm produces the required output for every legal input, not just the test inputs you tried.",
+      "Efficiency is measured asymptotically because constant factors and machine details obscure the underlying scaling behavior.",
+      "Big-O notation expresses an upper bound on growth rate, ignoring constant factors and lower-order terms.",
+      "The course's running example is sorting, used to compare insertion sort, merge sort, and lower bounds on comparison-based sorts.",
+      "Insertion sort runs in O(n^2) worst case but is fast in practice for small or nearly-sorted inputs.",
+      "Merge sort runs in O(n log n) by recursively splitting the array and merging two sorted halves in linear time.",
+      "Recurrences like T(n) = 2T(n/2) + O(n) are the central tool for analyzing divide-and-conquer algorithms.",
+      "The master theorem provides closed-form solutions for the most common divide-and-conquer recurrences.",
+      "The course's later modules generalize these tools to graphs, dynamic programming, and shortest paths."
+    ],
+    "summary": "The opening lecture frames the entire course around two questions: what does it mean to solve a computational problem correctly, and what does it mean to solve it efficiently? A computational problem is defined as a relation between legal inputs and required outputs. An algorithm is a procedure that computes that relation, and correctness requires that the procedure produce the right output on every legal input — not merely on the cases the author thought to test.\n\nEfficiency is then introduced via asymptotic analysis. Because constant factors depend on hardware, language, and compiler, the lecture argues that the meaningful comparison between algorithms is how their running time scales with input size. Big-O, big-Omega, and big-Theta are introduced as the formal language for that comparison.\n\nSorting is used as the running case study. Insertion sort, with its O(n^2) worst case, is contrasted with merge sort, whose divide-and-conquer structure yields O(n log n). The analysis of merge sort introduces recurrences and previews the master theorem, which the course will develop in later lectures. The instructor closes by sketching the trajectory of the course: from the basic toolkit of sorting and searching to graphs, dynamic programming, and shortest-path algorithms."
+  ,
+    "keyQuotes": [
+      {
+        "quote": "An algorithm is a mathematical object. We prove things about it. We don't just hope it works.",
+        "startSeconds": 312,
+        "timestampLabel": "5:12"
+      },
+      {
+        "quote": "Constant factors lie. Asymptotic behavior tells the truth.",
+        "startSeconds": 1140,
+        "timestampLabel": "19:00"
+      },
+      {
+        "quote": "Recurrences are the central conceptual tool of this course. If you understand recurrences, you understand most of what we will do.",
+        "startSeconds": 2208,
+        "timestampLabel": "36:48"
+      }
+    ],
+    "furtherReading": [
+      {
+        "title": "Introduction to Algorithms (CLRS)",
+        "author": "Cormen, Leiserson, Rivest, Stein",
+        "type": "book"
+      },
+      {
+        "title": "The master theorem",
+        "type": "concept"
+      },
+      {
+        "title": "MIT OpenCourseWare 6.006 problem sets",
+        "type": "tool"
+      }
+    ],
+    "tags": [
+      "algorithms",
+      "computer-science",
+      "asymptotic-analysis",
+      "sorting",
+      "recurrences"
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "video": {
+    "youtubeId": "fake-interview-id",
+    "title": "Andrew Huberman on sleep, focus, and dopamine",
+    "channelName": "Lex Fridman Podcast",
+    "durationSeconds": 7320,
+    "publishedAt": "2025-09-12"
+  },
+  "content": {
+    "oneLineSummary": "Sleep architecture and morning light exposure shape almost every waking system — focus, mood, dopamine regulation — more than any single supplement or hack.",
+    "cliffNotes": [
+      "Huberman: getting 5–10 minutes of unfiltered morning sunlight within an hour of waking is the single most leveraged circadian intervention.",
+      "Huberman: caffeine taken within 90 minutes of waking blunts the natural cortisol curve and creates an afternoon energy crash.",
+      "Fridman (Host): pushes back on whether the 90-minute caffeine rule holds for shift workers and people with very early start times.",
+      "Huberman: dopamine baselines drop after intense pleasure spikes, so chasing peak experiences narrows the range of things that feel rewarding.",
+      "Huberman: yoga nidra and non-sleep deep rest can partially compensate for a poor night by replenishing dopamine and cognitive capacity.",
+      "Huberman: cold exposure for 1–3 minutes a few times a week reliably elevates mood-related neurochemistry without the dopamine downside.",
+      "Fridman (Host): asks whether ambition itself becomes self-defeating when it relies on dopamine spikes; Huberman agrees it can.",
+      "Huberman: focus is a trainable skill — short bouts of intentional, distraction-free work followed by deliberate rest outperform marathon sessions."
+    ],
+    "summary": "Andrew Huberman frames the conversation around the physiology that quietly governs daily performance: circadian rhythm, dopamine, and the structure of sleep. He repeatedly returns to morning light as the highest-leverage intervention available to almost anyone — a few minutes of sunlight in the eyes shortly after waking sets the cortisol pulse, anchors melatonin onset that night, and improves mood and focus throughout the day. Caffeine, by contrast, is best delayed because consuming it too early masks the natural cortisol rise and produces the familiar mid-afternoon collapse.\n\nThe middle of the interview turns to dopamine, which Huberman describes less as a 'pleasure chemical' than as a regulator of motivation and the perceived value of effort. Repeated peak experiences — gambling, social media, doom-scrolling, even very intense exercise — pull baseline dopamine down, narrowing the range of things that subsequently feel worth doing. Practices like yoga nidra, cold exposure, and deliberate rest help restore that baseline without the rebound of a stimulant.\n\nFridman pushes on the social and ethical implications: whether ambition itself, framed as relentless pursuit of peaks, becomes self-defeating. Huberman agrees that a healthier model is rhythmic — sustained focus interleaved with deliberate decompression. They close on focus as a trainable capacity, with short, distraction-free blocks of work being more durable than long ones."
+  ,
+    "keyQuotes": [
+      {
+        "quote": "Get sunlight in your eyes within the first hour of waking. It is the single most powerful thing you can do for your sleep, your mood, and your focus.",
+        "startSeconds": 612,
+        "timestampLabel": "10:12"
+      },
+      {
+        "quote": "Dopamine isn't about pleasure. It's about the pursuit of pleasure, and that's a very different thing.",
+        "startSeconds": 2940,
+        "timestampLabel": "49:00"
+      },
+      {
+        "quote": "If everything is dopamine-driven peaks, eventually nothing feels worth doing. The trough is the price of the peak.",
+        "startSeconds": 4380,
+        "timestampLabel": "1:13:00"
+      }
+    ],
+    "furtherReading": [
+      {
+        "title": "Why We Sleep",
+        "author": "Matthew Walker",
+        "type": "book"
+      },
+      {
+        "title": "Yoga Nidra (non-sleep deep rest)",
+        "type": "concept"
+      },
+      {
+        "title": "Huberman Lab podcast",
+        "author": "Andrew Huberman",
+        "type": "tool"
+      }
+    ],
+    "tags": [
+      "neuroscience",
+      "sleep",
+      "dopamine",
+      "focus",
+      "circadian-rhythm"
+    ]
+  }
+}
