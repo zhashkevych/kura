@@ -8,7 +8,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <header className="border-b border-[var(--border)]">
         <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
           <div className="flex items-center gap-6">
-            <Link href="/app" className="text-lg font-semibold tracking-tight">
+            <Link
+              href="/app"
+              className="text-lg font-semibold tracking-tight rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+            >
               kura
             </Link>
             <nav className="flex items-center gap-4 text-sm text-[var(--muted-foreground)]">
