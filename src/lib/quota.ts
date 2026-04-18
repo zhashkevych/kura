@@ -1,14 +1,15 @@
 import { eq } from 'drizzle-orm';
+import { addMonths, startOfMonth } from 'date-fns';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { env } from './env';
 
-const MS_PER_DAY = 86_400_000;
-
-function nextResetFromNow(now: Date): Date {
-  const d = new Date(now);
-  d.setUTCMonth(d.getUTCMonth() + 1);
-  return d;
+/**
+ * Returns the start of the next calendar month at 00:00 local time.
+ * Used for monthly usage reset semantics.
+ */
+export function nextMonthlyReset(now: Date): Date {
+  return addMonths(startOfMonth(now), 1);
 }
 
 export type QuotaCheck =
@@ -17,7 +18,7 @@ export type QuotaCheck =
 
 /**
  * Atomically checks the user's monthly quota and increments usage when allowed.
- * Rolls the counter over if the reset timestamp has elapsed.
+ * Rolls the counter over when the stored reset timestamp has elapsed.
  */
 export async function checkAndIncrementQuota(userId: string): Promise<QuotaCheck> {
   const limit = env.FREE_TIER_MONTHLY_LIMIT;
@@ -36,9 +37,9 @@ export async function checkAndIncrementQuota(userId: string): Promise<QuotaCheck
   const user = rows[0];
   if (!user) throw new Error('User not found for quota check');
 
-  const expired = user.resetAt.getTime() + 30 * MS_PER_DAY < now.getTime();
+  const expired = now.getTime() >= user.resetAt.getTime();
   const effectiveCount = expired ? 0 : user.count;
-  const effectiveReset = expired ? nextResetFromNow(now) : user.resetAt;
+  const effectiveReset = expired ? nextMonthlyReset(now) : user.resetAt;
 
   if (effectiveCount >= limit) {
     return { ok: false, remaining: 0, limit, resetAt: effectiveReset };
@@ -88,12 +89,19 @@ export async function getQuotaStatus(userId: string) {
 
   const user = rows[0];
   const limit = env.FREE_TIER_MONTHLY_LIMIT;
-  if (!user) return { used: 0, limit, remaining: limit, resetAt: new Date() };
+  const now = new Date();
+  if (!user) return { used: 0, limit, remaining: limit, resetAt: nextMonthlyReset(now) };
+
+  // If the stored reset has elapsed, show the upcoming reset without mutating
+  // state here — the next checkAndIncrementQuota call will persist it.
+  const expired = now.getTime() >= user.resetAt.getTime();
+  const resetAt = expired ? nextMonthlyReset(now) : user.resetAt;
+  const used = expired ? 0 : user.count;
 
   return {
-    used: user.count,
+    used,
     limit,
-    remaining: Math.max(0, limit - user.count),
-    resetAt: user.resetAt,
+    remaining: Math.max(0, limit - used),
+    resetAt,
   };
 }
