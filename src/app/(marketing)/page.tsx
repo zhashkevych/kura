@@ -20,15 +20,9 @@ export default function LandingPage() {
         >
           Try it free
         </Link>
-        <Link
-          href="/sign-in"
-          className="rounded-md border border-[var(--border)] px-5 py-2.5 font-medium"
-        >
-          Sign in
-        </Link>
       </div>
 
-      <section className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <section className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-6">
         <Feature
           title="Structured output"
           body="Every summary has the same shape: one-line takeaway, cliff notes, quotes, further reading, tags."
