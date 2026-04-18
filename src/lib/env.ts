@@ -5,7 +5,7 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     CLERK_SECRET_KEY: z.string().min(1),
-    CLERK_WEBHOOK_SECRET: z.string().min(1),
+    CLERK_WEBHOOK_SECRET: z.string().min(1).optional(),
     SUPADATA_API_KEY: z.string().min(1),
     GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
     ANTHROPIC_API_KEY: z.string().optional(),

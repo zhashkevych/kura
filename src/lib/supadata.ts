@@ -58,15 +58,31 @@ export type VideoPayload = {
 
 const BASE = 'https://api.supadata.ai/v1';
 
-async function supadataFetch(path: string, params: Record<string, string>) {
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function supadataFetch(
+  path: string,
+  params: Record<string, string>,
+  attempt = 0,
+): Promise<unknown> {
   const url = new URL(BASE + path);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
 
   const res = await fetch(url, {
     headers: { 'x-api-key': env.SUPADATA_API_KEY },
-    // Vercel needs explicit no-store for this type of fetch.
     cache: 'no-store',
   });
+
+  if (res.status === 429 && attempt < 3) {
+    const retryAfter = Number(res.headers.get('retry-after'));
+    const delayMs = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1000
+      : 1500 * 2 ** attempt;
+    await sleep(delayMs);
+    return supadataFetch(path, params, attempt + 1);
+  }
 
   if (res.status === 404) throw new VideoNotFoundError();
   if (res.status === 403) throw new VideoPrivateError();
@@ -100,10 +116,12 @@ type RawMetadataResponse = {
 };
 
 export async function fetchVideo(youtubeId: string): Promise<VideoPayload> {
-  const [metaRaw, transcriptRaw] = await Promise.all([
-    supadataFetch('/youtube/video', { id: youtubeId }) as Promise<RawMetadataResponse>,
-    supadataFetch('/youtube/transcript', { videoId: youtubeId, text: 'false' }) as Promise<RawTranscriptResponse>,
-  ]);
+  // Sequential — Supadata's free tier rate-limits concurrent calls.
+  const metaRaw = (await supadataFetch('/youtube/video', { id: youtubeId })) as RawMetadataResponse;
+  const transcriptRaw = (await supadataFetch('/youtube/transcript', {
+    videoId: youtubeId,
+    text: 'false',
+  })) as RawTranscriptResponse;
 
   if (metaRaw.isLive) throw new VideoLiveError();
 

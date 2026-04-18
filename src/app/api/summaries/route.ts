@@ -64,13 +64,15 @@ export async function POST(req: Request) {
     .where(and(eq(summaries.userId, user.id), eq(summaries.videoId, video.id)))
     .limit(1);
 
-  if (existing) {
+  if (existing && existing.status !== 'failed') {
     return NextResponse.json(
       { summaryId: existing.id, status: existing.status },
       { status: 409 },
     );
   }
 
+  // If there's a prior failed summary for this pair, reuse it — quota was
+  // already refunded when it failed, so we re-charge here.
   const quota = await checkAndIncrementQuota(user.id);
   if (!quota.ok) {
     return NextResponse.json(
@@ -79,6 +81,28 @@ export async function POST(req: Request) {
       },
       { status: 402 },
     );
+  }
+
+  if (existing) {
+    await db
+      .update(summaries)
+      .set({
+        status: 'pending',
+        errorMessage: null,
+        templateId: template.id,
+        updatedAt: new Date(),
+      })
+      .where(eq(summaries.id, existing.id));
+
+    after(async () => {
+      try {
+        await processSummary(existing.id);
+      } catch (err) {
+        console.error('[after processSummary]', err);
+      }
+    });
+
+    return NextResponse.json({ summaryId: existing.id, status: 'pending' }, { status: 200 });
   }
 
   let summaryId: string;

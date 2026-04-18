@@ -16,6 +16,10 @@ export async function POST(req: Request) {
     return new Response('Missing svix headers', { status: 400 });
   }
 
+  if (!env.CLERK_WEBHOOK_SECRET) {
+    return new Response('Webhook not configured', { status: 503 });
+  }
+
   const body = await req.text();
   const wh = new Webhook(env.CLERK_WEBHOOK_SECRET);
 
