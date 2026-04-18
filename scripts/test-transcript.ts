@@ -1,4 +1,8 @@
-// Usage: SUPADATA_API_KEY=... npx tsx scripts/test-transcript.ts <URL>
+// Usage: npx tsx scripts/test-transcript.ts <URL>
+import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+loadEnv({ path: '.env.local', override: true });
+
 import { extractYoutubeId } from '../src/lib/youtube';
 import { fetchVideo } from '../src/lib/supadata';
 

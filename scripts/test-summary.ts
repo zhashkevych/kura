@@ -1,4 +1,8 @@
 // Usage: npx tsx scripts/test-summary.ts <URL>
+import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+loadEnv({ path: '.env.local', override: true });
+
 import { extractYoutubeId } from '../src/lib/youtube';
 import { fetchVideo } from '../src/lib/supadata';
 import { generateSummary } from '../src/lib/llm/gemini';

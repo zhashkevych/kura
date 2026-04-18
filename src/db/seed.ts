@@ -1,3 +1,7 @@
+import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+loadEnv({ path: '.env.local', override: true });
+
 import { and, eq, isNull } from 'drizzle-orm';
 import { db } from './index';
 import { templates } from './schema';
