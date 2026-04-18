@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { formatTimestamp } from '@/lib/youtube';
 import { SummaryViewer } from './summary-viewer';
@@ -34,6 +35,7 @@ export function SummaryPageClient({
   initial: SummaryInitial;
   initialMarkdown: string | null;
 }) {
+  const router = useRouter();
   const [state, setState] = useState<SummaryInitial>(initial);
   const [markdown, setMarkdown] = useState<string | null>(initialMarkdown);
 
@@ -71,6 +73,29 @@ export function SummaryPageClient({
     };
   }, [state.id, state.status, markdown]);
 
+  const youtubeUrl = state.video.youtubeId
+    ? `https://www.youtube.com/watch?v=${state.video.youtubeId}`
+    : null;
+
+  const isFailed = state.status === 'failed';
+  const displayTitle =
+    state.video.title ||
+    (isFailed && youtubeUrl ? youtubeUrl : 'Fetching video…');
+
+  const handleRetry = async () => {
+    const res = await fetch(`/api/summaries/${state.id}/retry`, { method: 'POST' });
+    if (res.ok) {
+      setState((s) => ({ ...s, status: 'pending', errorMessage: null }));
+    }
+  };
+
+  const handleDelete = async () => {
+    const res = await fetch(`/api/summaries/${state.id}`, { method: 'DELETE' });
+    if (res.ok || res.status === 404) {
+      router.push('/app');
+    }
+  };
+
   return (
     <article className="space-y-6">
       <header className="flex gap-4">
@@ -88,8 +113,8 @@ export function SummaryPageClient({
           <div className="w-40 h-[90px] bg-[var(--muted)] rounded shrink-0" />
         )}
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold line-clamp-2">
-            {state.video.title || 'Fetching video…'}
+          <h1 className="text-xl font-semibold line-clamp-2 break-all">
+            {displayTitle}
           </h1>
           <div className="mt-1 text-sm text-[var(--muted-foreground)]">
             {state.video.channelName || '—'}
@@ -98,14 +123,16 @@ export function SummaryPageClient({
               : ''}
           </div>
           <div className="mt-3 flex gap-2">
-            <a
-              href={`https://www.youtube.com/watch?v=${state.video.youtubeId}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm rounded border border-[var(--border)] px-2.5 py-1"
-            >
-              Open on YouTube
-            </a>
+            {youtubeUrl && (
+              <a
+                href={youtubeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm rounded border border-[var(--border)] px-2.5 py-1"
+              >
+                Open on YouTube
+              </a>
+            )}
             {state.status === 'ready' && (
               <DownloadButton summaryId={state.id} />
             )}
@@ -115,8 +142,12 @@ export function SummaryPageClient({
 
       {state.status === 'pending' || state.status === 'processing' ? (
         <ProcessingIndicator status={state.status} />
-      ) : state.status === 'failed' ? (
-        <FailedBlock message={state.errorMessage} />
+      ) : isFailed ? (
+        <FailedBlock
+          message={state.errorMessage}
+          onRetry={handleRetry}
+          onDelete={handleDelete}
+        />
       ) : markdown ? (
         <SummaryViewer markdown={markdown} />
       ) : (
@@ -126,12 +157,50 @@ export function SummaryPageClient({
   );
 }
 
-function FailedBlock({ message }: { message: string | null }) {
+function FailedBlock({
+  message,
+  onRetry,
+  onDelete,
+}: {
+  message: string | null;
+  onRetry: () => Promise<void>;
+  onDelete: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<'idle' | 'retry' | 'delete'>('idle');
+
+  const run = (kind: 'retry' | 'delete', action: () => Promise<void>) => async () => {
+    if (busy !== 'idle') return;
+    setBusy(kind);
+    try {
+      await action();
+    } finally {
+      setBusy('idle');
+    }
+  };
+
   return (
     <div className="rounded-lg border border-[var(--destructive)] bg-[var(--destructive)]/5 p-4">
       <div className="font-medium">We couldn&apos;t generate this summary.</div>
       <div className="mt-1 text-sm text-[var(--muted-foreground)]">
         {message ?? 'Unknown error.'}
+      </div>
+      <div className="mt-4 flex gap-2">
+        <button
+          type="button"
+          onClick={run('retry', onRetry)}
+          disabled={busy !== 'idle'}
+          className="text-sm rounded bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-1.5 disabled:opacity-50"
+        >
+          {busy === 'retry' ? 'Retrying…' : 'Retry'}
+        </button>
+        <button
+          type="button"
+          onClick={run('delete', onDelete)}
+          disabled={busy !== 'idle'}
+          className="text-sm rounded border border-[var(--border)] px-3 py-1.5 disabled:opacity-50"
+        >
+          {busy === 'delete' ? 'Deleting…' : 'Delete'}
+        </button>
       </div>
     </div>
   );

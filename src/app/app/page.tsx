@@ -9,6 +9,24 @@ import { formatTimestamp } from '@/lib/youtube';
 
 export const dynamic = 'force-dynamic';
 
+type LibraryRow = {
+  title: string | null;
+  status: 'pending' | 'processing' | 'ready' | 'failed';
+  youtubeId: string;
+};
+
+function rowTitle(r: LibraryRow): string {
+  if (r.title) return r.title;
+  if (r.status === 'failed') {
+    if (r.youtubeId) {
+      const url = `https://www.youtube.com/watch?v=${r.youtubeId}`;
+      return url.length > 50 ? `${url.slice(0, 49)}…` : url;
+    }
+    return 'Untitled summary';
+  }
+  return 'Fetching…';
+}
+
 export default async function LibraryPage() {
   const user = await requireAppUser();
 
@@ -76,8 +94,8 @@ export default async function LibraryPage() {
                 <div className="shrink-0 w-32 h-[72px] bg-[var(--muted)] rounded" />
               )}
               <div className="flex-1 min-w-0">
-                <div className="font-medium group-hover:underline line-clamp-2">
-                  {r.title || 'Fetching…'}
+                <div className="font-medium group-hover:underline line-clamp-2 break-all">
+                  {rowTitle(r)}
                 </div>
                 <div className="text-sm text-[var(--muted-foreground)] mt-1">
                   {r.channelName || '—'}
@@ -85,7 +103,13 @@ export default async function LibraryPage() {
                   {' · '}
                   {formatDistanceToNow(r.createdAt, { addSuffix: true })}
                   {r.status !== 'ready' && (
-                    <span className="ml-2 rounded bg-[var(--muted)] px-1.5 py-0.5 text-xs uppercase tracking-wide">
+                    <span
+                      className={`ml-2 rounded px-1.5 py-0.5 text-xs uppercase tracking-wide ${
+                        r.status === 'failed'
+                          ? 'bg-[var(--destructive)] text-white'
+                          : 'bg-[var(--muted)]'
+                      }`}
+                    >
                       {r.status}
                     </span>
                   )}
