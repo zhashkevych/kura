@@ -67,6 +67,30 @@ export default function LandingPage() {
           />
         </div>
       </section>
+
+      <section className="mx-auto max-w-5xl px-6 py-20">
+        <h2 className="text-3xl font-semibold tracking-tight">From fifteen minutes to thirty seconds</h2>
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Workflow
+            label="Manual workflow"
+            steps={[
+              'Open YouTube, enable captions.',
+              'Copy the transcript from the CC panel.',
+              'Paste into ChatGPT, write a prompt.',
+              'Review, fix errors, trim irrelevant sections.',
+              'Copy output into your vault.',
+              'Add frontmatter, tags, source URL by hand.',
+              'Link back to video timestamps manually.',
+            ]}
+            total="~15 min"
+          />
+          <Workflow
+            label="With Kura"
+            steps={['Paste URL.', 'Pick a template.', 'Download or sync.']}
+            total="~30 sec"
+          />
+        </div>
+      </section>
     </main>
   );
 }
@@ -76,6 +100,35 @@ function Feature({ title, body }: { title: string; body: string }) {
     <div className="rounded-lg border border-[var(--border)] p-4">
       <h3 className="font-semibold">{title}</h3>
       <p className="mt-2 text-sm text-[var(--muted-foreground)]">{body}</p>
+    </div>
+  );
+}
+
+function Workflow({
+  label,
+  steps,
+  total,
+}: {
+  label: string;
+  steps: string[];
+  total: string;
+}) {
+  return (
+    <div className="flex flex-col">
+      <div className="text-xs uppercase tracking-wide text-[var(--muted-foreground)]">
+        {label}
+      </div>
+      <ol className="mt-4 space-y-2 text-sm">
+        {steps.map((step, i) => (
+          <li key={i} className="flex gap-3">
+            <span className="font-mono tabular-nums text-[var(--muted-foreground)]">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-6 font-mono text-2xl">{total}</div>
     </div>
   );
 }
