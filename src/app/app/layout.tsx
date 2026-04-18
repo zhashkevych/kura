@@ -11,9 +11,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-6">
             <Link
               href="/app"
-              className="text-lg font-semibold tracking-tight rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+              className="flex items-center gap-2 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
             >
-              kura
+              <span
+                aria-hidden="true"
+                className="flex h-7 w-7 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] text-sm leading-none"
+                style={{
+                  fontFamily:
+                    '"Hiragino Sans", "Yu Gothic", "Noto Sans CJK JP", "Microsoft YaHei", sans-serif',
+                }}
+              >
+                蔵
+              </span>
+              <span className="text-lg font-semibold tracking-tight">kura</span>
             </Link>
             <AppNav />
           </div>
