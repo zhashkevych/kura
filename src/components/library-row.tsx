@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { differenceInDays, format, formatDistanceToNow } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { formatTimestamp } from '@/lib/youtube';
 
@@ -37,6 +37,17 @@ function rowTitle(r: LibraryRowData): { node: React.ReactNode; fetching: boolean
     ),
     fetching: true,
   };
+}
+
+export function RelativeTimestamp({ iso }: { iso: string }) {
+  const d = new Date(iso);
+  const now = new Date();
+  const absolute = format(d, 'MMMM d, yyyy, h:mm a');
+  const relative = formatDistanceToNow(d, { addSuffix: true });
+  const showAbsolute = differenceInDays(now, d) >= 7;
+  const visible = showAbsolute ? format(d, 'MMMM d, yyyy') : relative;
+  const tooltip = showAbsolute ? relative : absolute;
+  return <span title={tooltip}>{visible}</span>;
 }
 
 export function LibraryRow({ row }: { row: LibraryRowData }) {
@@ -103,7 +114,8 @@ export function LibraryRow({ row }: { row: LibraryRowData }) {
             {row.channelName || '—'}
             {row.durationSeconds ? ` · ${formatTimestamp(row.durationSeconds)}` : ''}
             {' · '}
-            {formatDistanceToNow(new Date(row.createdAt), { addSuffix: true })}
+            <RelativeTimestamp iso={row.createdAt} />
+
             {row.status !== 'ready' && (
               <span
                 className={`ml-2 rounded px-1.5 py-0.5 text-xs uppercase tracking-wide ${
