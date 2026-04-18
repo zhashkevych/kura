@@ -30,9 +30,10 @@ export default async function LibraryPage() {
   if (rows.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <h1 className="text-2xl font-semibold">Your library is empty.</h1>
+        <div aria-hidden className="text-5xl mb-4">📚</div>
+        <h1 className="text-2xl font-semibold">Your library is empty</h1>
         <p className="mt-2 text-[var(--muted-foreground)]">
-          Paste a YouTube URL to capture your first note.
+          Paste your first YouTube URL to build your second brain.
         </p>
         <Link
           href="/app/new"
