@@ -40,3 +40,8 @@ body {
 * {
   border-color: var(--border);
 }
+
+.brand-mark {
+  font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans CJK JP",
+    "Microsoft YaHei", sans-serif;
+}

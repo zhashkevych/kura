@@ -15,11 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <span
                 aria-hidden="true"
-                className="flex h-7 w-7 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] text-sm leading-none"
-                style={{
-                  fontFamily:
-                    '"Hiragino Sans", "Yu Gothic", "Noto Sans CJK JP", "Microsoft YaHei", sans-serif',
-                }}
+                className="brand-mark flex h-7 w-7 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] text-sm leading-none"
               >
                 蔵
               </span>
