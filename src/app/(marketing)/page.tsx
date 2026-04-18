@@ -142,6 +142,45 @@ export default function LandingPage() {
           </a>
         </div>
       </section>
+
+      <section className="mx-auto max-w-5xl px-6 py-20">
+        <h2 className="text-3xl font-semibold tracking-tight">Pricing</h2>
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <PricingCard
+            name="Free"
+            price="$0"
+            tagline="For trying it out."
+            bullets={[
+              '10 summaries per month',
+              'All three templates',
+              'Markdown export',
+              'Hosted, no setup',
+            ]}
+            ctaLabel="Try it free →"
+            ctaHref="/sign-up"
+            emphasized={false}
+          />
+          <PricingCard
+            name="Pro"
+            price="$9.99"
+            priceSuffix="/month"
+            priceFootnote="or $84/year"
+            tagline="For daily use."
+            bullets={[
+              'Unlimited summaries',
+              'Channel subscriptions (coming soon)',
+              'Notion sync',
+              'Priority support',
+            ]}
+            ctaLabel="Start free trial →"
+            ctaHref="/sign-up"
+            emphasized
+          />
+        </div>
+        <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
+          Or self-host the open-source core with your own API key — free forever.
+        </p>
+      </section>
     </main>
   );
 }
@@ -151,6 +190,71 @@ function Feature({ title, body }: { title: string; body: string }) {
     <div className="rounded-lg border border-[var(--border)] p-4">
       <h3 className="font-semibold">{title}</h3>
       <p className="mt-2 text-sm text-[var(--muted-foreground)]">{body}</p>
+    </div>
+  );
+}
+
+function PricingCard({
+  name,
+  price,
+  priceSuffix,
+  priceFootnote,
+  tagline,
+  bullets,
+  ctaLabel,
+  ctaHref,
+  emphasized,
+}: {
+  name: string;
+  price: string;
+  priceSuffix?: string;
+  priceFootnote?: string;
+  tagline: string;
+  bullets: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  emphasized: boolean;
+}) {
+  return (
+    <div
+      className={
+        'flex h-full flex-col rounded-lg p-6 ' +
+        (emphasized
+          ? 'border-2 border-[var(--foreground)]'
+          : 'border border-[var(--border)]')
+      }
+    >
+      <div className="text-sm font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
+        {name}
+      </div>
+      <div className="mt-4 flex items-baseline gap-1">
+        <span className="text-4xl font-semibold tracking-tight">{price}</span>
+        {priceSuffix ? (
+          <span className="text-[var(--muted-foreground)]">{priceSuffix}</span>
+        ) : null}
+      </div>
+      {priceFootnote ? (
+        <div className="mt-1 text-sm text-[var(--muted-foreground)]">{priceFootnote}</div>
+      ) : null}
+      <p className="mt-3 text-sm text-[var(--muted-foreground)]">{tagline}</p>
+      <ul className="mt-6 space-y-2 text-sm">
+        {bullets.map((b) => (
+          <li key={b}>{b}</li>
+        ))}
+      </ul>
+      <div className="mt-auto pt-8">
+        <Link
+          href={ctaHref}
+          className={
+            'inline-block rounded-md px-4 py-2 font-medium ' +
+            (emphasized
+              ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+              : 'border border-[var(--border)]')
+          }
+        >
+          {ctaLabel}
+        </Link>
+      </div>
     </div>
   );
 }
