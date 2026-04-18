@@ -91,6 +91,57 @@ export default function LandingPage() {
           />
         </div>
       </section>
+
+      <section className="mx-auto max-w-2xl px-6 py-20">
+        <h2 className="text-3xl font-semibold tracking-tight">Open-source core</h2>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a
+            href="https://github.com/zhashkevych/kura"
+            className="inline-block"
+            aria-label="Kura GitHub stars"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://img.shields.io/github/stars/zhashkevych/kura?style=flat-square&label=Stars"
+              alt="GitHub stars"
+              loading="lazy"
+              height={20}
+            />
+          </a>
+          <a
+            href="https://github.com/zhashkevych/kura/blob/main/LICENSE"
+            className="inline-block"
+            aria-label="Kura license"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://img.shields.io/github/license/zhashkevych/kura?style=flat-square"
+              alt="License"
+              loading="lazy"
+              height={20}
+            />
+          </a>
+        </div>
+        <p className="mt-6 text-[var(--muted-foreground)]">
+          The transcript pipeline, Markdown renderer, Obsidian plugin, and self-host backend are
+          on GitHub. Run the whole thing on your own hardware with your own Gemini or Claude API
+          key. Use the hosted tier if you&apos;d rather not. Both paths produce the same Markdown.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-6 text-sm">
+          <a
+            href="https://github.com/zhashkevych/kura"
+            className="font-medium underline-offset-4 hover:underline"
+          >
+            View on GitHub →
+          </a>
+          <a
+            href="https://github.com/zhashkevych/kura#self-host"
+            className="text-[var(--muted-foreground)] underline-offset-4 hover:underline"
+          >
+            Self-host guide →
+          </a>
+        </div>
+      </section>
     </main>
   );
 }
