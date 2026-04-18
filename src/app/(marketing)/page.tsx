@@ -24,16 +24,16 @@ export default function LandingPage() {
 
       <section className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-6">
         <Feature
-          title="Structured output"
-          body="Every summary has the same shape: one-line takeaway, cliff notes, quotes, further reading, tags."
+          title="Writes to your vault, not another silo"
+          body="A .md file with YAML frontmatter. Drop it in Obsidian, Notion, Logseq, or any folder of Markdown. No lock-in. Your notes live in your filesystem, indexed by the tool you already trust."
         />
         <Feature
-          title="Obsidian-ready"
-          body="Download a .md file with YAML frontmatter. Drop it in your vault and it's indexed."
+          title="Timestamped quotes link back to YouTube"
+          body="Every quoted passage in the summary includes a clickable timestamp. One click takes you back to the exact moment in the video — verify a claim, re-listen, or dig deeper."
         />
         <Feature
-          title="Three templates"
-          body="Generic, Interview, Lecture. Each tuned for a different kind of video."
+          title="Open-source core, bring your own key"
+          body="The CLI, self-host backend, and Obsidian plugin are on GitHub. Run it yourself with a Gemini or Claude API key. Or skip the setup and use the hosted tier for $9.99/mo."
         />
       </section>
     </main>
