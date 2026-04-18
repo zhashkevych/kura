@@ -6,8 +6,22 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-[var(--border)]">
         <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            kura
+          <Link
+            href="/"
+            aria-label="Kura home"
+            className="flex items-center gap-2"
+          >
+            <span
+              aria-hidden="true"
+              className="flex h-7 w-7 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] text-sm leading-none"
+              style={{
+                fontFamily:
+                  '"Hiragino Sans", "Yu Gothic", "Noto Sans CJK JP", "Microsoft YaHei", sans-serif',
+              }}
+            >
+              蔵
+            </span>
+            <span className="text-lg font-semibold tracking-tight">kura</span>
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <SignedOut>
