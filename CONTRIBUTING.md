@@ -44,10 +44,9 @@ Scopes are optional but used (`feat(app): …`, `fix(llm): …`).
 ## Architecture orientation
 
 [`CLAUDE.md`](./CLAUDE.md) is the single source of truth for the architecture:
-request flow, quota invariants, the LLM contract, the schema-triplet that must
-stay in lockstep, and the gotchas. Read it before making non-trivial changes.
-It's named for Claude Code but it's the right onboarding doc for any
-contributor.
+request flow, the LLM contract, the schema-triplet that must stay in lockstep,
+and the gotchas. Read it before making non-trivial changes. It's named for
+Claude Code but it's the right onboarding doc for any contributor.
 
 ## Scope and non-goals
 

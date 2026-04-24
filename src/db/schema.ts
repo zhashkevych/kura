@@ -15,8 +15,6 @@ export const users = pgTable('users', {
   clerkId: text('clerk_id').notNull().unique(),
   email: text('email').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  monthlyUsageCount: integer('monthly_usage_count').notNull().default(0),
-  monthlyUsageResetAt: timestamp('monthly_usage_reset_at').notNull().defaultNow(),
 });
 
 export const videos = pgTable('videos', {

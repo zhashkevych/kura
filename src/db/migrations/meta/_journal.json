@@ -8,6 +8,13 @@
       "when": 1776460969788,
       "tag": "0000_initial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777029561934,
+      "tag": "0001_secret_whizzer",
+      "breakpoints": true
     }
   ]
 }

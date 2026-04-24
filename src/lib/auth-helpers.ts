@@ -2,7 +2,6 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { users, type User } from '@/db/schema';
-import { nextMonthlyReset } from '@/lib/quota';
 
 /**
  * Returns the DB user row for the current Clerk session, creating a row on
@@ -29,7 +28,7 @@ export async function getOrCreateAppUser(): Promise<User | null> {
 
   const [inserted] = await db
     .insert(users)
-    .values({ clerkId, email, monthlyUsageResetAt: nextMonthlyReset(new Date()) })
+    .values({ clerkId, email })
     .onConflictDoUpdate({ target: users.clerkId, set: { email } })
     .returning();
   return inserted;

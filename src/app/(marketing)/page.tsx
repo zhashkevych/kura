@@ -19,7 +19,7 @@ export default function LandingPage() {
             href="/sign-up"
             className="rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] px-5 py-2.5 font-medium"
           >
-            Try it free
+            Get started
           </Link>
         </div>
 
@@ -33,8 +33,8 @@ export default function LandingPage() {
             body="Every quoted passage in the summary includes a clickable timestamp. One click takes you back to the exact moment in the video — verify a claim, re-listen, or dig deeper."
           />
           <Feature
-            title="Open-source core, bring your own key"
-            body="The CLI, self-host backend, and Obsidian plugin are on GitHub. Run it yourself with a Gemini or Claude API key. Or skip the setup and use the hosted tier for $9.99/mo."
+            title="Open-source, bring your own key"
+            body="The entire app is on GitHub under MIT. Fork it, self-host it, swap the model, change the templates. Plug in a Gemini or Claude API key and run it on your own hardware."
           />
         </div>
       </section>
@@ -94,9 +94,9 @@ export default function LandingPage() {
           </a>
         </div>
         <p className="mt-6 text-[var(--muted-foreground)]">
-          The transcript pipeline, Markdown renderer, Obsidian plugin, and self-host backend are
-          on GitHub. Run the whole thing on your own hardware with your own Gemini or Claude API
-          key. Use the hosted tier if you&apos;d rather not. Both paths produce the same Markdown.
+          The transcript pipeline, Markdown renderer, Obsidian plugin, and backend are on GitHub
+          under MIT. Run the whole thing on your own hardware with your own Gemini or Claude API
+          key — no quotas, no billing, no lock-in.
         </p>
         <div className="mt-6 flex flex-wrap gap-6 text-sm">
           <a
@@ -114,45 +114,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-20">
-        <h2 className="text-3xl font-semibold tracking-tight">Pricing</h2>
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <PricingCard
-            name="Free"
-            price="$0"
-            tagline="For trying it out."
-            bullets={[
-              '10 summaries per month',
-              'All three templates',
-              'Markdown export',
-              'Hosted, no setup',
-            ]}
-            ctaLabel="Try it free →"
-            ctaHref="/sign-up"
-            emphasized={false}
-          />
-          <PricingCard
-            name="Pro"
-            price="$9.99"
-            priceSuffix="/month"
-            priceFootnote="or $84/year"
-            tagline="For daily use."
-            bullets={[
-              'Unlimited summaries',
-              'Channel subscriptions (coming soon)',
-              'Notion sync',
-              'Priority support',
-            ]}
-            ctaLabel="Start free trial →"
-            ctaHref="/sign-up"
-            emphasized
-          />
-        </div>
-        <p className="mt-6 text-center text-sm text-[var(--muted-foreground)]">
-          Or self-host the open-source core with your own API key — free forever.
-        </p>
-      </section>
-
       <section className="mx-auto max-w-3xl px-6 py-20">
         <h2 className="text-3xl font-semibold tracking-tight">Frequently asked</h2>
         <div className="mt-10">
@@ -168,23 +129,19 @@ export default function LandingPage() {
             extraction when the hosted transcript provider is unavailable — useful if you care
             about resilience or run into region-blocked videos.
           </FaqItem>
-          <FaqItem question="What counts as a summary on the free tier?">
-            One URL processed = one summary, regardless of video length. Re-processing the same
-            URL does not count twice — we dedupe server-side. The counter resets monthly.
+          <FaqItem question="Does re-processing the same URL create a duplicate?">
+            No. Kura dedupes server-side per user — submitting the same URL twice returns the
+            existing summary instead of re-running the pipeline.
           </FaqItem>
           <FaqItem question="Which models does Kura use?">
-            The hosted tier uses Gemini 2.5 Flash for structured output. Self-hosters can swap in
-            any model that supports structured JSON output — Claude, GPT-4o, local models via an
+            The default is Gemini 2.5 Flash for structured output. You can swap in any model that
+            supports structured JSON output — Claude, GPT-4o, local models via an
             OpenAI-compatible endpoint. Model choice is a config flag.
           </FaqItem>
           <FaqItem question="Is my data private?">
             Transcripts and summaries are stored in your account&apos;s database row. They are
-            not used to train any model. On self-host, nothing leaves your machine except the
-            call to the LLM provider you chose. See the privacy policy for the full story.
-          </FaqItem>
-          <FaqItem question="What happens if I cancel Pro?">
-            Your summaries remain accessible and exportable. You drop to the free tier
-            (10/month). No data is deleted.
+            not used to train any model. When you self-host, nothing leaves your machine except
+            the call to the LLM provider you chose.
           </FaqItem>
         </div>
       </section>
@@ -221,71 +178,6 @@ function FaqItem({ question, children }: { question: string; children: React.Rea
       </summary>
       <div className="mt-3 text-sm text-[var(--muted-foreground)]">{children}</div>
     </details>
-  );
-}
-
-function PricingCard({
-  name,
-  price,
-  priceSuffix,
-  priceFootnote,
-  tagline,
-  bullets,
-  ctaLabel,
-  ctaHref,
-  emphasized,
-}: {
-  name: string;
-  price: string;
-  priceSuffix?: string;
-  priceFootnote?: string;
-  tagline: string;
-  bullets: string[];
-  ctaLabel: string;
-  ctaHref: string;
-  emphasized: boolean;
-}) {
-  return (
-    <div
-      className={
-        'flex h-full flex-col rounded-lg p-6 ' +
-        (emphasized
-          ? 'border-2 border-[var(--foreground)]'
-          : 'border border-[var(--border)]')
-      }
-    >
-      <div className="text-sm font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-        {name}
-      </div>
-      <div className="mt-4 flex items-baseline gap-1">
-        <span className="text-4xl font-semibold tracking-tight">{price}</span>
-        {priceSuffix ? (
-          <span className="text-[var(--muted-foreground)]">{priceSuffix}</span>
-        ) : null}
-      </div>
-      {priceFootnote ? (
-        <div className="mt-1 text-sm text-[var(--muted-foreground)]">{priceFootnote}</div>
-      ) : null}
-      <p className="mt-3 text-sm text-[var(--muted-foreground)]">{tagline}</p>
-      <ul className="mt-6 space-y-2 text-sm">
-        {bullets.map((b) => (
-          <li key={b}>{b}</li>
-        ))}
-      </ul>
-      <div className="mt-auto pt-8">
-        <Link
-          href={ctaHref}
-          className={
-            'inline-block rounded-md px-4 py-2 font-medium ' +
-            (emphasized
-              ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
-              : 'border border-[var(--border)]')
-          }
-        >
-          {ctaLabel}
-        </Link>
-      </div>
-    </div>
   );
 }
 

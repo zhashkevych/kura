@@ -6,7 +6,6 @@ import { db } from '@/db';
 import { summaries, templates, videos } from '@/db/schema';
 import { extractYoutubeId } from '@/lib/youtube';
 import { getOrCreateAppUser } from '@/lib/auth-helpers';
-import { checkAndIncrementQuota, decrementQuota } from '@/lib/quota';
 import { processSummary } from '@/lib/worker/process-summary';
 
 export const dynamic = 'force-dynamic';
@@ -71,18 +70,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // If there's a prior failed summary for this pair, reuse it — quota was
-  // already refunded when it failed, so we re-charge here.
-  const quota = await checkAndIncrementQuota(user.id);
-  if (!quota.ok) {
-    return NextResponse.json(
-      {
-        error: `Monthly quota reached (${quota.limit}). Resets ${quota.resetAt.toISOString()}.`,
-      },
-      { status: 402 },
-    );
-  }
-
   if (existing) {
     await db
       .update(summaries)
@@ -119,7 +106,6 @@ export async function POST(req: Request) {
 
     summaryId = inserted.id;
   } catch (err) {
-    await decrementQuota(user.id);
     console.error('[POST /api/summaries] insert failed:', err);
     return NextResponse.json({ error: 'Could not create summary.' }, { status: 500 });
   }

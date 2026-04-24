@@ -30,18 +30,13 @@ npx tsx scripts/test-summary.ts    "<youtube url>"   # full pipeline → LLM
 
 Kura turns a YouTube URL into a structured Markdown note. Request flow:
 
-1. `POST /api/summaries` (`src/app/api/summaries/route.ts`) — auth, parse URL, upsert `videos` stub, **dedupe** per `(userId, videoId)`, atomically increment quota, insert `summaries` row with `status: 'pending'`, schedule `processSummary` via Next's `after()` and return `summaryId`.
-2. `processSummary` (`src/lib/worker/process-summary.ts`) runs out-of-band: fetches transcript via Supadata, hard-rejects videos > 2h, calls Gemini, writes `content`/`status: 'ready'`. On failure it refunds the quota.
+1. `POST /api/summaries` (`src/app/api/summaries/route.ts`) — auth, parse URL, upsert `videos` stub, **dedupe** per `(userId, videoId)`, insert `summaries` row with `status: 'pending'`, schedule `processSummary` via Next's `after()` and return `summaryId`.
+2. `processSummary` (`src/lib/worker/process-summary.ts`) runs out-of-band: fetches transcript via Supadata, hard-rejects videos > 2h, calls Gemini, writes `content`/`status: 'ready'`. On failure it marks the row `failed` with a user-facing error.
 3. Client polls `GET /api/summaries/[id]`; when `ready`, `/app/summaries/[id]` renders the content via the template's `markdownTemplate` (Handlebars).
 
 Because the worker is `after()` — not a queue — **Vercel Fluid Compute must be enabled** in prod so the response doesn't cut off background work. There is no retry queue; `POST /api/summaries/[id]/retry` re-runs `processSummary` on demand.
 
-### Quota (`src/lib/quota.ts`)
-
-- Monthly counter on `users` with a `monthlyUsageResetAt` timestamp.
-- `checkAndIncrementQuota` is the single write path: it rolls the counter over lazily when the reset time has passed, and charges *before* work begins.
-- `decrementQuota` is the refund path, called on insert failure and on `processSummary` failure — preserving the invariant that failed runs don't consume quota.
-- Limit is `FREE_TIER_MONTHLY_LIMIT` (default 10). Over-quota returns HTTP 402.
+This is an open-source, self-host-first app with no billing, no paid tier, and no per-user quota. `costUsdCents`/token counts are recorded on `summaries` for operational visibility only — nothing enforces a limit.
 
 ### LLM contract (`src/lib/llm/gemini.ts` + `src/types/summary-content.ts`)
 
@@ -75,8 +70,7 @@ All env access goes through `src/lib/env.ts` (`@t3-oss/env-nextjs`). Do not read
 ## Conventions and gotchas
 
 - Path alias `@/*` → `src/*` (tsconfig + vitest).
-- Dedup semantics in `POST /api/summaries`: existing non-failed summary returns HTTP 409 with the existing `summaryId`; existing *failed* summary is reused (same row), quota is re-charged, status reset to `pending`.
+- Dedup semantics in `POST /api/summaries`: existing non-failed summary returns HTTP 409 with the existing `summaryId`; existing *failed* summary is reused (same row) with status reset to `pending`.
 - `videos` rows are shared across users (keyed by `youtubeId`). `summaries` has a `unique(userId, videoId)` constraint that enforces dedupe at the DB layer.
-- Never bypass quota checks when adding new summary-creation paths — a failed run must refund via `decrementQuota`, not leak.
 - `durationSeconds > 7200` (2h) is a hard reject inside the worker; add new limits next to `MAX_DURATION_SECONDS` in `process-summary.ts`.
 - Phase 2+ features deliberately not implemented: Notion sync, custom user templates UI, channel subscriptions, pgvector search. Schema tables exist (`notion_connections`, `channel_subscriptions`) but are unused.

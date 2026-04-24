@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { summaries, templates, videos } from '@/db/schema';
-import { decrementQuota } from '@/lib/quota';
 import {
   fetchVideo,
   SupadataError,
@@ -117,12 +116,6 @@ export async function processSummary(summaryId: string): Promise<void> {
 }
 
 async function markFailed(summaryId: string, errorMessage: string) {
-  const [existing] = await db
-    .select({ userId: summaries.userId, status: summaries.status })
-    .from(summaries)
-    .where(eq(summaries.id, summaryId))
-    .limit(1);
-
   await db
     .update(summaries)
     .set({
@@ -131,11 +124,6 @@ async function markFailed(summaryId: string, errorMessage: string) {
       updatedAt: new Date(),
     })
     .where(eq(summaries.id, summaryId));
-
-  // Refund quota so a failed run doesn't count against the user's monthly cap.
-  if (existing && existing.status !== 'failed') {
-    await decrementQuota(existing.userId);
-  }
 }
 
 function toUserFriendlyMessage(err: unknown): string {

@@ -24,9 +24,9 @@ Notion database. Kura runs the transcript through Gemini against a Handlebars
 template, gives you back a `.md` file that drops cleanly into your existing
 notes.
 
-The hosted version at [kura-md.com](https://kura-md.com) is free with a small
-monthly quota. This repo is the entire app — fork it, self-host it, change the
-templates, change the model.
+Kura is open source under MIT. This repo is the entire app — fork it,
+self-host it, change the templates, change the model. There's no billing,
+no paid tier, and no usage limit beyond whatever your LLM provider charges.
 
 ## Stack
 
@@ -101,11 +101,11 @@ npx tsx scripts/test-summary.ts "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ## Architecture
 
 See [`CLAUDE.md`](./CLAUDE.md) for the full architecture: request flow, the
-quota invariants, the LLM contract and its three-schema lockstep, the
-auth/database setup, and the gotchas you should know before changing anything.
+LLM contract and its three-schema lockstep, the auth/database setup, and the
+gotchas you should know before changing anything.
 
-A 30-second version: `POST /api/summaries` validates and reserves quota
-synchronously, then schedules the heavy work via Next's `after()`. The worker
+A 30-second version: `POST /api/summaries` validates the URL and inserts a
+pending row, then schedules the heavy work via Next's `after()`. The worker
 fetches the transcript, calls Gemini with a constrained JSON schema, validates
 with Zod (with a repair-retry ladder), and writes the result. The client polls
 for completion and renders the Markdown via the template's Handlebars source.

@@ -29,9 +29,6 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     );
   }
 
-  // Note: intentionally skip checkAndIncrementQuota — the original submission
-  // already consumed quota and was refunded on failure; retrying should not
-  // re-bill the user (per UI-1 spec).
   await db
     .update(summaries)
     .set({ status: 'pending', errorMessage: null, updatedAt: new Date() })

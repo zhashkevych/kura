@@ -6,8 +6,7 @@ import type { VideoPayload } from '@/lib/supadata';
 
 const MODEL = 'gemini-2.5-flash';
 
-// Gemini 2.5 Flash public pricing (USD per 1M tokens), rounded up so we
-// slightly over-estimate cost — safer for a free-tier quota than under.
+// Gemini 2.5 Flash public pricing (USD per 1M tokens), rounded up.
 const PRICE_PER_1M_INPUT_USD = 0.3;
 const PRICE_PER_1M_OUTPUT_USD = 2.5;
 

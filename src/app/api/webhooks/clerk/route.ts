@@ -5,7 +5,6 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { env } from '@/lib/env';
-import { nextMonthlyReset } from '@/lib/quota';
 
 export async function POST(req: Request) {
   const headerPayload = await headers();
@@ -49,7 +48,7 @@ export async function POST(req: Request) {
 
       await db
         .insert(users)
-        .values({ clerkId, email, monthlyUsageResetAt: nextMonthlyReset(new Date()) })
+        .values({ clerkId, email })
         .onConflictDoUpdate({
           target: users.clerkId,
           set: { email },
