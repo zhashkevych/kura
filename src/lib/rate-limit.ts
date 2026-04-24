@@ -100,3 +100,60 @@ export function formatRateLimitError(result: Extract<RateLimitResult, { ok: fals
   }
   return `Rate limit reached (${result.limit} per ${window}). Try again in ~${minutes} min.`;
 }
+
+export type SummaryUsage = {
+  hour: { used: number; limit: number; resetsAt: Date | null };
+  day: { used: number; limit: number; resetsAt: Date | null };
+};
+
+/**
+ * Read-only counterpart to `checkSummaryRateLimit`: returns current usage
+ * against both windows for display in the UI. `resetsAt` is when the oldest
+ * in-window row ages out (i.e. when `used` drops by one); `null` if nothing
+ * has been counted yet.
+ */
+export async function getSummaryUsage(userId: string): Promise<SummaryUsage> {
+  const hourLimit = env.SUMMARY_RATE_LIMIT_HOUR;
+  const dayLimit = env.SUMMARY_RATE_LIMIT_DAY;
+
+  const now = new Date();
+  const hourCutoff = new Date(now.getTime() - HOUR_SECONDS * 1000);
+  const dayCutoff = new Date(now.getTime() - DAY_SECONDS * 1000);
+
+  try {
+    const [row] = await db
+      .select({
+        hourCount: sql<number>`count(*) filter (where ${summaries.updatedAt} > ${hourCutoff})`,
+        dayCount: sql<number>`count(*) filter (where ${summaries.updatedAt} > ${dayCutoff})`,
+      })
+      .from(summaries)
+      .where(and(eq(summaries.userId, userId), gt(summaries.updatedAt, dayCutoff)));
+
+    const hourCount = Number(row?.hourCount ?? 0);
+    const dayCount = Number(row?.dayCount ?? 0);
+
+    const [oldestHour, oldestDay] = await Promise.all([
+      hourCount > 0 ? oldestUpdatedAtInWindow(userId, hourCutoff) : Promise.resolve(null),
+      dayCount > 0 ? oldestUpdatedAtInWindow(userId, dayCutoff) : Promise.resolve(null),
+    ]);
+
+    return {
+      hour: {
+        used: hourCount,
+        limit: hourLimit,
+        resetsAt: oldestHour ? new Date(oldestHour.getTime() + HOUR_SECONDS * 1000) : null,
+      },
+      day: {
+        used: dayCount,
+        limit: dayLimit,
+        resetsAt: oldestDay ? new Date(oldestDay.getTime() + DAY_SECONDS * 1000) : null,
+      },
+    };
+  } catch (err) {
+    console.error('[rate-limit] usage query failed:', err);
+    return {
+      hour: { used: 0, limit: hourLimit, resetsAt: null },
+      day: { used: 0, limit: dayLimit, resetsAt: null },
+    };
+  }
+}

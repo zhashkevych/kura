@@ -39,7 +39,7 @@ vi.mock('@/db', () => ({
   },
 }));
 
-import { checkSummaryRateLimit, formatRateLimitError } from './rate-limit';
+import { checkSummaryRateLimit, formatRateLimitError, getSummaryUsage } from './rate-limit';
 
 const USER_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -135,6 +135,40 @@ describe('checkSummaryRateLimit', () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.retryAfterSeconds).toBe(3600);
+  });
+});
+
+describe('getSummaryUsage', () => {
+  it('returns zeroed counts and null resets when the user has no history', async () => {
+    enqueueCount(0, 0);
+    const usage = await getSummaryUsage(USER_ID);
+    expect(usage).toEqual({
+      hour: { used: 0, limit: 5, resetsAt: null },
+      day: { used: 0, limit: 20, resetsAt: null },
+    });
+  });
+
+  it('projects resetsAt from the oldest-in-window timestamp for each window', async () => {
+    vi.setSystemTime(new Date('2026-04-24T12:00:00Z'));
+    const oldestHour = new Date('2026-04-24T11:30:00Z');
+    const oldestDay = new Date('2026-04-24T02:00:00Z');
+    enqueueCount(3, 8);
+    // hour lookup first, then day lookup (Promise.all preserves arg order)
+    queue.push([{ updatedAt: oldestHour }]);
+    queue.push([{ updatedAt: oldestDay }]);
+
+    const usage = await getSummaryUsage(USER_ID);
+    expect(usage.hour.used).toBe(3);
+    expect(usage.hour.resetsAt?.toISOString()).toBe('2026-04-24T12:30:00.000Z');
+    expect(usage.day.used).toBe(8);
+    expect(usage.day.resetsAt?.toISOString()).toBe('2026-04-25T02:00:00.000Z');
+  });
+
+  it('returns a safe zeroed snapshot on DB errors', async () => {
+    queue.push(new Error('nope'));
+    const usage = await getSummaryUsage(USER_ID);
+    expect(usage.hour).toEqual({ used: 0, limit: 5, resetsAt: null });
+    expect(usage.day).toEqual({ used: 0, limit: 20, resetsAt: null });
   });
 });
 
