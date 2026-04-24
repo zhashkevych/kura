@@ -119,6 +119,11 @@ for completion and renders the Markdown via the template's Handlebars source.
 4. Point your Clerk webhook at the production URL.
 5. Run `npm run db:push && npm run db:seed` from your workstation against the
    production `DATABASE_URL` once on first deploy.
+6. Tune rate limits if your deployment needs it. `POST /api/summaries` and
+   `POST /api/summaries/[id]/retry` are limited per authenticated user by
+   `SUMMARY_RATE_LIMIT_HOUR` (default 5) and `SUMMARY_RATE_LIMIT_DAY` (default
+   20). Raise them for private self-hosted deployments; lower them to cap
+   LLM cost on a public instance.
 
 ## Roadmap and non-goals
 

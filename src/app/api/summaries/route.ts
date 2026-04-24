@@ -6,6 +6,7 @@ import { db } from '@/db';
 import { summaries, templates, videos } from '@/db/schema';
 import { extractYoutubeId } from '@/lib/youtube';
 import { getOrCreateAppUser } from '@/lib/auth-helpers';
+import { checkSummaryRateLimit, formatRateLimitError } from '@/lib/rate-limit';
 import { processSummary } from '@/lib/worker/process-summary';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,20 @@ const postBody = z.object({
 export async function POST(req: Request) {
   const user = await getOrCreateAppUser();
   if (!user) return new NextResponse('Unauthorized', { status: 401 });
+
+  const limit = await checkSummaryRateLimit(user.id);
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        error: formatRateLimitError(limit),
+        retryAfterSeconds: limit.retryAfterSeconds,
+      },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(limit.retryAfterSeconds) },
+      },
+    );
+  }
 
   const parsed = postBody.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {

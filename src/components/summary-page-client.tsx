@@ -88,7 +88,14 @@ export function SummaryPageClient({
     const res = await fetch(`/api/summaries/${state.id}/retry`, { method: 'POST' });
     if (res.ok) {
       setState((s) => ({ ...s, status: 'pending', errorMessage: null }));
+      return;
     }
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    setState((s) => ({
+      ...s,
+      status: 'failed',
+      errorMessage: data.error ?? `Retry failed (${res.status}).`,
+    }));
   };
 
   const handleDelete = async () => {

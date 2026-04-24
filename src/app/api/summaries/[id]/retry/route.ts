@@ -3,6 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { summaries } from '@/db/schema';
 import { getOrCreateAppUser } from '@/lib/auth-helpers';
+import { checkSummaryRateLimit, formatRateLimitError } from '@/lib/rate-limit';
 import { processSummary } from '@/lib/worker/process-summary';
 
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,20 @@ export const dynamic = 'force-dynamic';
 export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await getOrCreateAppUser();
   if (!user) return new NextResponse('Unauthorized', { status: 401 });
+
+  const limit = await checkSummaryRateLimit(user.id);
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        error: formatRateLimitError(limit),
+        retryAfterSeconds: limit.retryAfterSeconds,
+      },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(limit.retryAfterSeconds) },
+      },
+    );
+  }
 
   const { id } = await ctx.params;
 

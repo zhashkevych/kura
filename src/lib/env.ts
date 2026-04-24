@@ -13,6 +13,8 @@ export const env = createEnv({
     NOTION_CLIENT_SECRET: z.string().optional(),
     NOTION_REDIRECT_URI: z.string().url().optional(),
     ENCRYPTION_KEY: z.string().optional(),
+    SUMMARY_RATE_LIMIT_HOUR: z.coerce.number().int().positive().default(5),
+    SUMMARY_RATE_LIMIT_DAY: z.coerce.number().int().positive().default(20),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -29,6 +31,8 @@ export const env = createEnv({
     NOTION_CLIENT_SECRET: process.env.NOTION_CLIENT_SECRET,
     NOTION_REDIRECT_URI: process.env.NOTION_REDIRECT_URI,
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+    SUMMARY_RATE_LIMIT_HOUR: process.env.SUMMARY_RATE_LIMIT_HOUR,
+    SUMMARY_RATE_LIMIT_DAY: process.env.SUMMARY_RATE_LIMIT_DAY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   },

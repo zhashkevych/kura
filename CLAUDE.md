@@ -73,4 +73,5 @@ All env access goes through `src/lib/env.ts` (`@t3-oss/env-nextjs`). Do not read
 - Dedup semantics in `POST /api/summaries`: existing non-failed summary returns HTTP 409 with the existing `summaryId`; existing *failed* summary is reused (same row) with status reset to `pending`.
 - `videos` rows are shared across users (keyed by `youtubeId`). `summaries` has a `unique(userId, videoId)` constraint that enforces dedupe at the DB layer.
 - `durationSeconds > 7200` (2h) is a hard reject inside the worker; add new limits next to `MAX_DURATION_SECONDS` in `process-summary.ts`.
+- Rate limiting (`src/lib/rate-limit.ts`) counts `summaries.updatedAt` within rolling hour/day windows — so it captures initial POSTs, reuses of failed rows, and explicit retries without a dedicated counter table. Any future path that invokes `processSummary` MUST bump `updatedAt` first, or the limiter will undercount it.
 - Phase 2+ features deliberately not implemented: Notion sync, custom user templates UI, channel subscriptions, pgvector search. Schema tables exist (`notion_connections`, `channel_subscriptions`) but are unused.
